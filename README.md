@@ -1,7 +1,9 @@
 # dispatch-up
 
 ```
-./dispatch-up -a 127.0.0.1:31015 -f ./some.zip
+dispatch-up -f ./some.zip
+dispatch-up -a http://127.0.0.1:8080/ -f ./some.zip
+dispatch-up -a http://127.0.0.1:8080/ -d /temp/ -f ./some.zip
 ```
 
 ### build
