@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+var (
+	HttpClient = &http.Client{
+		Timeout: 0,
+	}
+)
+
 func randomBoundary() string {
 	var buf [30]byte
 	_, err := io.ReadFull(rand.Reader, buf[:])
@@ -68,7 +74,7 @@ func Upload(url, flpath string) {
 				progress := strconv.Itoa(i) + "%"
 				j := (100 - i) / 2
 				h := strings.Repeat("=", 50-j) + strings.Repeat(" ", j)
-				fmt.Print("\r["+h+"] | ", progress, " | ", strconv.FormatFloat(fupsz, 'f', 0, 64), "/", stat.Size())
+				fmt.Print("\r["+h+"]  ", progress, "  ", strconv.FormatFloat(fupsz, 'f', 0, 64), "/", stat.Size())
 			}
 			if err == io.EOF {
 				break
@@ -78,7 +84,7 @@ func Upload(url, flpath string) {
 		body.Write(nil)
 	}()
 
-	resp, err := http.DefaultClient.Do(reqest)
+	resp, err := HttpClient.Do(reqest)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -86,8 +92,8 @@ func Upload(url, flpath string) {
 
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
-		fmt.Println("\n上传成功")
+		fmt.Println("\nsuccessful uploaded!")
 	} else {
-		fmt.Println("\n上传失败,StatusCode:", resp.StatusCode)
+		fmt.Println("\nupload failed! code:", resp.StatusCode)
 	}
 }

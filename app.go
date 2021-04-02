@@ -4,7 +4,6 @@ import (
 	"dispatch-up/service"
 	"flag"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"net/url"
 	"os"
 	"os/user"
@@ -24,7 +23,6 @@ var (
 	dir     = flag.String("d", getEnv("DISPATCH_DIR", ""), "要上传到的目录路径，例如：/temp/")
 	file    = flag.String("f", getEnv("DISPATCH_DIR", ""), "要上传的文件路径，例如：./nginx.conf")
 	h       = flag.Bool("h", false, "show help.")
-	debug   = flag.Bool("debug", false, "show debug info.")
 )
 
 func usage() {
@@ -77,15 +75,16 @@ func main() {
 		}
 	}
 
-	b, _ := yaml.Marshal(setting)
-	fmt.Println(string(b))
+	fmt.Println("address: " + setting.Address)
+	fmt.Println("dir: " + setting.Dir)
+	fmt.Println("file: " + *file)
 
 	if setting.Address == "" || *file == "" {
 		usage()
 		return
 	}
 
-	service.Upload("http://"+u.Host+"/file/UploadFile?Path="+setting.Dir, *file)
+	service.Upload(u.Scheme+"://"+u.Host+"/file/UploadFile?Path="+setting.Dir, *file)
 }
 
 func stringP(s string) *string {
