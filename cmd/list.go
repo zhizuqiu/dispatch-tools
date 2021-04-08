@@ -16,30 +16,46 @@ package cmd
 
 import (
 	"dispatch/service"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// upCmd represents the up command
-var upCmd = &cobra.Command{
-	Use:   "up",
-	Args:  cobra.ExactArgs(1),
-	Short: "上传文件",
-	Long: `上传文件
+// listCmd represents the list command
+var listCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"ls"},
+	Args:    NoArgs,
+	Short:   "查询文件",
+	Long: `查询文件
 
 用法：
-dispatch up ./some.zip
-dispatch up -a http://127.0.0.1:8080/ ./some.zip
-dispatch up -a http://127.0.0.1:8080/ -d /temp/ ./some.zip
+dispatch list
+dispatch list -a http://127.0.0.1:8080/
+dispatch list -a http://127.0.0.1:8080/ -d /temp/
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		confAddress := viper.GetString("address")
 		confDir := viper.GetString("dir")
+		wide, _ := cmd.Flags().GetBool("wide")
 
-		service.Upload(confAddress, confDir, args[0])
+		service.List(confAddress, confDir, wide)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(upCmd)
+	listCmd.Flags().BoolP("wide", "w", false, "更详细的展示")
+	rootCmd.AddCommand(listCmd)
+}
+
+// NoArgs returns an error if any args are included.
+func NoArgs(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return errors.Errorf(
+			"%q accepts no arguments\n\nUsage:  %s",
+			cmd.CommandPath(),
+			cmd.UseLine(),
+		)
+	}
+	return nil
 }

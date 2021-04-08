@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	HttpClient = &http.Client{
+	HttpClientNoTimeout = &http.Client{
 		Timeout: 0,
 	}
 )
@@ -26,13 +26,30 @@ func randomBoundary() string {
 	return fmt.Sprintf("%x", buf[:])
 }
 
-func Upload(url, flpath string) {
+func Upload(address, dir, file string) {
+
+	dir = parseDir(dir)
+	_url, err := getUploadUrl(address, dir)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("address: " + address)
+	fmt.Println("dir: " + dir)
+	fmt.Println("file: " + file)
+	fmt.Println("")
+
+	if address == "" || file == "" {
+		return
+	}
+
 	body := ruisUtil.NewCircleByteBuffer(10240)
 	boundary := randomBoundary()
 	boundarybytes := []byte("\r\n--" + boundary + "\r\n")
 	endbytes := []byte("\r\n--" + boundary + "--\r\n")
 
-	reqest, err := http.NewRequest("POST", url, body)
+	reqest, err := http.NewRequest("POST", _url, body)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -41,7 +58,7 @@ func Upload(url, flpath string) {
 	reqest.Header.Add("Content-Type", "multipart/form-data; charset=utf-8; boundary="+boundary)
 
 	go func() {
-		f, err := os.OpenFile(flpath, os.O_RDONLY, 0666)
+		f, err := os.OpenFile(file, os.O_RDONLY, 0666)
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
@@ -84,7 +101,7 @@ func Upload(url, flpath string) {
 		body.Write(nil)
 	}()
 
-	resp, err := HttpClient.Do(reqest)
+	resp, err := HttpClientNoTimeout.Do(reqest)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

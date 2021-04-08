@@ -17,29 +17,28 @@ package cmd
 import (
 	"dispatch/service"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-// upCmd represents the up command
-var upCmd = &cobra.Command{
-	Use:   "up",
-	Args:  cobra.ExactArgs(1),
-	Short: "上传文件",
-	Long: `上传文件
+// downloadCmd represents the download command
+var downloadCmd = &cobra.Command{
+	Use:     "download",
+	Aliases: []string{"dl"},
+	Args:    cobra.ExactArgs(1),
+	Short:   "下载文件",
+	Long: `下载文件
 
 用法：
-dispatch up ./some.zip
-dispatch up -a http://127.0.0.1:8080/ ./some.zip
-dispatch up -a http://127.0.0.1:8080/ -d /temp/ ./some.zip
+dispatch download http://127.0.0.1/some.zip
+dispatch download -p /temp/ http://127.0.0.1/some.zip
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		confAddress := viper.GetString("address")
-		confDir := viper.GetString("dir")
+		path, _ := cmd.Flags().GetString("path")
 
-		service.Upload(confAddress, confDir, args[0])
+		service.Download(path, args[0])
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(upCmd)
+	downloadCmd.Flags().StringP("path", "p", "./", "要下载到的目录路径")
+	rootCmd.AddCommand(downloadCmd)
 }
