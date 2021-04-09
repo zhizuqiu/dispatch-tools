@@ -80,7 +80,7 @@ func Upload(address, dir, file string) {
 		fupsz := float64(0)
 		buf := make([]byte, 1024)
 
-		bar := pb.ProgressBarTemplate(downloadBarTmpl).Start64(int64(fsz))
+		bar := pb.ProgressBarTemplate(uploadBarTmpl).Start64(int64(fsz))
 		bar.SetMaxWidth(100)
 
 		for {
