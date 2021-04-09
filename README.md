@@ -1,13 +1,27 @@
-# dispatch-up
+# dispatch-tools
 
 ```
-dispatch-up -f ./some.zip
-dispatch-up -a http://127.0.0.1:8080/ -f ./some.zip
-dispatch-up -a http://127.0.0.1:8080/ -d /temp/ -f ./some.zip
+dispatch tools
+
+Usage:
+  dispatch [command]
+
+Available Commands:
+  download    下载文件
+  help        Help about any command
+  list        查询文件
+  up          上传文件
+
+Flags:
+  -a, --address string   dispatch server 的地址，例如：-a http://127.0.0.1:8080/
+      --config string    配置文件 (默认：$HOME/.dispatch/dispatch.yaml)
+  -d, --dir string       dispatch server 的目录路径，例如：-d /temp/
+  -h, --help             help for dispatch
+
 ```
 
 ### build
 
 ```
-GOOS=linux GOARCH=amd64 go build -o dist/amd64/dispatch-up
+GOOS=linux GOARCH=amd64 go build -o dist/amd64/dispatch
 ```

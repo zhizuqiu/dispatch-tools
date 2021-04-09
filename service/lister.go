@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/gosuri/uitable"
 	"io/ioutil"
 	"net"
@@ -88,10 +89,11 @@ func List(address, dir string, wide bool) {
 	}
 
 	table := uitable.New()
-	table.MaxColWidth = 80
+	// table.MaxColWidth = 50
+	table.Separator = "  "
 
 	if wide {
-		table.AddRow("Name", "Dir", "LastModified", "Length", "Url")
+		table.AddRow("Name", "LastModified", "Length", "Url")
 		for _, f := range pathSlice {
 			url, err := getDownloadUrl(address, f.Path)
 			if err != nil {
@@ -99,16 +101,16 @@ func List(address, dir string, wide bool) {
 				return
 			}
 			if f.IsDir {
-				table.AddRow(f.Name, f.IsDir, f.LastModified, f.Length, url)
+				table.AddRow(color.HiBlueString(f.Name), f.LastModified, f.Length, url)
 			} else {
-				table.AddRow(f.Name, f.IsDir, f.LastModified, f.Length, url)
+				table.AddRow(f.Name, f.LastModified, f.Length, url)
 			}
 		}
 	} else {
 		table.AddRow("Name", "LastModified", "Length")
 		for _, f := range pathSlice {
 			if f.IsDir {
-				table.AddRow(f.Name, f.LastModified, f.Length)
+				table.AddRow(color.HiBlueString(f.Name), f.LastModified, f.Length)
 			} else {
 				table.AddRow(f.Name, f.LastModified, f.Length)
 			}

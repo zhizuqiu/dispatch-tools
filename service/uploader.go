@@ -3,12 +3,11 @@ package service
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/cheggaaa/pb/v3"
 	ruisUtil "github.com/mgr9525/go-ruisutil"
 	"io"
 	"net/http"
 	"os"
-	"strconv"
-	"strings"
 )
 
 var (
@@ -35,10 +34,11 @@ func Upload(address, dir, file string) {
 		return
 	}
 
+	fmt.Println()
 	fmt.Println("address: " + address)
 	fmt.Println("dir: " + dir)
 	fmt.Println("file: " + file)
-	fmt.Println("")
+	fmt.Println()
 
 	if address == "" || file == "" {
 		return
@@ -79,6 +79,10 @@ func Upload(address, dir, file string) {
 		fsz := float64(stat.Size())
 		fupsz := float64(0)
 		buf := make([]byte, 1024)
+
+		bar := pb.ProgressBarTemplate(downloadBarTmpl).Start64(int64(fsz))
+		bar.SetMaxWidth(100)
+
 		for {
 			n, err := f.Read(buf)
 			if n > 0 {
@@ -87,11 +91,7 @@ func Upload(address, dir, file string) {
 					fmt.Println(err)
 				}
 				fupsz += float64(nz)
-				i := int((fupsz / fsz) * 100)
-				progress := strconv.Itoa(i) + "%"
-				j := (100 - i) / 2
-				h := strings.Repeat("=", 50-j) + strings.Repeat(" ", j)
-				fmt.Print("\r["+h+"]  ", progress, "  ", strconv.FormatFloat(fupsz, 'f', 0, 64), "/", stat.Size())
+				bar.SetCurrent(int64(fupsz))
 			}
 			if err == io.EOF {
 				break
@@ -99,6 +99,7 @@ func Upload(address, dir, file string) {
 		}
 		body.Write(endbytes)
 		body.Write(nil)
+		bar.Finish()
 	}()
 
 	resp, err := HttpClientNoTimeout.Do(reqest)
@@ -109,8 +110,8 @@ func Upload(address, dir, file string) {
 
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
-		fmt.Println("\nsuccessful uploaded!")
+		fmt.Println("\nUpload Completed!")
 	} else {
-		fmt.Println("\nupload failed! code:", resp.StatusCode)
+		fmt.Println("\nUpload Failed! code:", resp.StatusCode)
 	}
 }

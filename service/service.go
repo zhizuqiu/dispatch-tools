@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+var downloadBarTmpl = `{{ green "DOWNLOADING" }}: {{ bar . "[" ">" (cycle . "↖" "↗" "↘" "↙" ) "." "]"}}  {{percent .}}  {{counters . }} `
+var uploadBarTmpl = `{{ green "UPLOADING" }}: {{ bar . "[" ">" (cycle . "↖" "↗" "↘" "↙" ) "." "]"}}  {{percent .}}  {{counters . }} `
+
 func parseDir(dir string) string {
 	if dir == "" {
 		dir = "/"

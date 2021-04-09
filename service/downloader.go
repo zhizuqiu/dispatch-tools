@@ -2,13 +2,12 @@ package service
 
 import (
 	"fmt"
+	"github.com/cheggaaa/pb/v3"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
-	"strconv"
-	"strings"
 )
 
 func Download(dpath, durl string) {
@@ -56,37 +55,37 @@ func Download(dpath, durl string) {
 	reader := &Reader{
 		Reader: res.Body,
 		Total:  res.ContentLength,
+		Bar:    pb.ProgressBarTemplate(downloadBarTmpl).Start64(res.ContentLength),
 	}
+	reader.Bar.SetMaxWidth(100)
 
+	fmt.Println()
 	fmt.Println("path: " + dpath)
 	fmt.Println("url: " + durl)
-	fmt.Println("filepath: " + filepath)
-	fmt.Println("")
+	fmt.Println("file path: " + filepath)
+	fmt.Println()
 
 	_, err = io.Copy(f, reader)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	reader.Bar.Finish()
 
-	fmt.Println("\ndownload successful!")
+	fmt.Println("\nDownload Successful!")
 }
 
 type Reader struct {
 	io.Reader
 	Total   int64
 	Current int64
+	Bar     *pb.ProgressBar
 }
 
 func (r *Reader) Read(p []byte) (n int, err error) {
 	n, err = r.Reader.Read(p)
 
 	r.Current += int64(n)
-	// fmt.Printf("\r进度 %.2f%%", float64(r.Current*10000/r.Total)/100)
-	i := int(r.Current * 100 / r.Total)
-	progress := strconv.Itoa(i) + "%"
-	j := (100 - i) / 2
-	h := strings.Repeat("=", 50-j) + strings.Repeat(" ", j)
-	fmt.Print("\r["+h+"]  ", progress, "  ", strconv.FormatFloat(float64(r.Current), 'f', 0, 64), "/", r.Total)
+	r.Bar.SetCurrent(r.Current)
 	return
 }
