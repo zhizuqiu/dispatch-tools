@@ -7,6 +7,7 @@ Usage:
   dispatch [command]
 
 Available Commands:
+  config      查看配置文件
   download    下载文件
   help        Help about any command
   list        查询文件
@@ -17,7 +18,6 @@ Flags:
       --config string    配置文件 (默认：$HOME/.dispatch/dispatch.yaml)
   -d, --dir string       dispatch server 的目录路径，例如：-d /temp/
   -h, --help             help for dispatch
-
 ```
 
 ### build
