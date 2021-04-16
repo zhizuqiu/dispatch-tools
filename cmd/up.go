@@ -36,7 +36,7 @@ dispatch up -a http://127.0.0.1:8080/ -d /temp/ ./some.zip
 		confAddress := viper.GetString("address")
 		confDir := viper.GetString("dir")
 
-		service.Upload(confAddress, confDir, args[0])
+		service.Upload3(confAddress, confDir, args[0])
 	},
 }
 

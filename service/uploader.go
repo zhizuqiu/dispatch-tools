@@ -76,11 +76,11 @@ func Upload(address, dir, file string) {
 		body.Write(boundarybytes)
 		body.Write([]byte(header))
 
-		fsz := float64(stat.Size())
-		fupsz := float64(0)
+		fsz := stat.Size()
+		fupsz := 0
 		buf := make([]byte, 1024)
 
-		bar := pb.ProgressBarTemplate(uploadBarTmpl).Start64(int64(fsz))
+		bar := pb.ProgressBarTemplate(uploadBarTmpl).Start64(fsz)
 		bar.SetMaxWidth(100)
 
 		for {
@@ -90,13 +90,14 @@ func Upload(address, dir, file string) {
 				if err != nil {
 					fmt.Println(err)
 				}
-				fupsz += float64(nz)
+				fupsz += nz
 				bar.SetCurrent(int64(fupsz))
 			}
 			if err == io.EOF {
 				break
 			}
 		}
+
 		body.Write(endbytes)
 		body.Write(nil)
 		bar.Finish()
