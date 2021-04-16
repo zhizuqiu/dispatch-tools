@@ -54,7 +54,6 @@ func Download(dpath, durl string) {
 
 	reader := &Reader{
 		Reader: res.Body,
-		Total:  res.ContentLength,
 		Bar:    pb.ProgressBarTemplate(downloadBarTmpl).Start64(res.ContentLength),
 	}
 	reader.Bar.SetMaxWidth(100)

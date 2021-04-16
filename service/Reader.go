@@ -7,7 +7,6 @@ import (
 
 type Reader struct {
 	io.Reader
-	Total   int64
 	Current int64
 	Bar     *pb.ProgressBar
 }

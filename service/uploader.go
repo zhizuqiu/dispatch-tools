@@ -77,7 +77,6 @@ func uploadFileMultipart(url string, path string) (*http.Response, error) {
 
 	reader := &Reader{
 		Reader: bufferedFileReader,
-		Total:  stat.Size(),
 		Bar:    pb.ProgressBarTemplate(uploadBarTmpl).Start64(stat.Size()),
 	}
 	reader.Bar.SetMaxWidth(100)
