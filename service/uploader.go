@@ -1,32 +1,17 @@
 package service
 
 import (
-	"crypto/rand"
+	"bufio"
 	"fmt"
 	"github.com/cheggaaa/pb/v3"
-	ruisUtil "github.com/mgr9525/go-ruisutil"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
+	"sync"
 )
-
-var (
-	HttpClientNoTimeout = &http.Client{
-		Timeout: 0,
-	}
-)
-
-func randomBoundary() string {
-	var buf [30]byte
-	_, err := io.ReadFull(rand.Reader, buf[:])
-	if err != nil {
-		panic(err)
-	}
-	return fmt.Sprintf("%x", buf[:])
-}
 
 func Upload(address, dir, file string) {
-
 	dir = parseDir(dir)
 	_url, err := getUploadUrl(address, dir)
 	if err != nil {
@@ -44,75 +29,83 @@ func Upload(address, dir, file string) {
 		return
 	}
 
-	body := ruisUtil.NewCircleByteBuffer(10240)
-	boundary := randomBoundary()
-	boundarybytes := []byte("\r\n--" + boundary + "\r\n")
-	endbytes := []byte("\r\n--" + boundary + "--\r\n")
-
-	reqest, err := http.NewRequest("POST", _url, body)
+	response, err := uploadFileMultipart(_url, file)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		fmt.Println(err)
+		return
 	}
-	reqest.Header.Add("Connection", "keep-alive")
-	reqest.Header.Add("Content-Type", "multipart/form-data; charset=utf-8; boundary="+boundary)
+	defer response.Body.Close()
 
-	go func() {
-		f, err := os.OpenFile(file, os.O_RDONLY, 0666)
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-
-		stat, err := f.Stat()
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-		defer f.Close()
-
-		header := fmt.Sprintf("Content-Disposition: form-data; name=\"upfile\"; filename=\"%s\"\r\nContent-Type: application/octet-stream\r\n\r\n", stat.Name())
-
-		body.Write(boundarybytes)
-		body.Write([]byte(header))
-
-		fsz := stat.Size()
-		fupsz := 0
-		buf := make([]byte, 1024)
-
-		bar := pb.ProgressBarTemplate(uploadBarTmpl).Start64(fsz)
-		bar.SetMaxWidth(100)
-
-		for {
-			n, err := f.Read(buf)
-			if n > 0 {
-				nz, err := body.Write(buf[0:n])
-				if err != nil {
-					fmt.Println(err)
-				}
-				fupsz += nz
-				bar.SetCurrent(int64(fupsz))
-			}
-			if err == io.EOF {
-				break
-			}
-		}
-
-		body.Write(endbytes)
-		body.Write(nil)
-		bar.Finish()
-	}()
-
-	resp, err := HttpClientNoTimeout.Do(reqest)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	defer resp.Body.Close()
-	if resp.StatusCode == 200 {
+	if response.StatusCode == 200 {
 		fmt.Println("\nUpload Completed!")
 	} else {
-		fmt.Println("\nUpload Failed! code:", resp.StatusCode)
+		fmt.Println("\nUpload Failed! code:", response.StatusCode)
 	}
+}
+
+func uploadFileMultipart(url string, path string) (*http.Response, error) {
+	f, err := os.OpenFile(path, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reduce number of syscalls when reading from disk.
+	bufferedFileReader := bufio.NewReader(f)
+	defer f.Close()
+
+	// Create a pipe for writing from the file and reading to
+	// the request concurrently.
+	bodyReader, bodyWriter := io.Pipe()
+	formWriter := multipart.NewWriter(bodyWriter)
+
+	// Store the first write error in writeErr.
+	var (
+		writeErr error
+		errOnce  sync.Once
+	)
+	setErr := func(err error) {
+		if err != nil {
+			errOnce.Do(func() { writeErr = err })
+		}
+	}
+
+	stat, err := f.Stat()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	reader := &Reader{
+		Reader: bufferedFileReader,
+		Total:  stat.Size(),
+		Bar:    pb.ProgressBarTemplate(uploadBarTmpl).Start64(stat.Size()),
+	}
+	reader.Bar.SetMaxWidth(100)
+
+	go func() {
+		partWriter, err := formWriter.CreateFormFile("upfile", path)
+		setErr(err)
+		_, err = io.Copy(partWriter, reader)
+		setErr(err)
+		setErr(formWriter.Close())
+		setErr(bodyWriter.Close())
+		reader.Bar.Finish()
+	}()
+
+	req, err := http.NewRequest(http.MethodPost, url, bodyReader)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Content-Type", formWriter.FormDataContentType())
+
+	// This operation will block until both the formWriter
+	// and bodyWriter have been closed by the goroutine,
+	// or in the event of a HTTP error.
+	resp, err := http.DefaultClient.Do(req)
+
+	if writeErr != nil {
+		return nil, writeErr
+	}
+
+	return resp, err
 }

@@ -10,7 +10,8 @@ import (
 	"path/filepath"
 )
 
-func Upload3(address, dir, file string) {
+// 不带进度条
+func Upload2(address, dir, file string) {
 
 	dir = parseDir(dir)
 	_url, err := getUploadUrl(address, dir)
@@ -39,37 +40,11 @@ func Upload3(address, dir, file string) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
-	/*
-		stat, err := f.Stat()
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
-	*/
-
-	/*
-		reader := &Reader{
-			Reader: f,
-			Total:  stat.Size(),
-			Bar:    pb.ProgressBarTemplate(downloadBarTmpl).Start64(stat.Size()),
-		}
-		reader.Bar.SetMaxWidth(100)
-	*/
-
 	part, err := writer.CreateFormFile("upfile", filepath.Base(f.Name()))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	/*
-		w := &Writer{
-			Writer: part,
-			Total:  stat.Size(),
-			Bar:    pb.ProgressBarTemplate(downloadBarTmpl).Start64(stat.Size()),
-		}
-		w.Bar.SetMaxWidth(100)
-	*/
 
 	_, err = io.Copy(part, f)
 	if err != nil {
@@ -77,8 +52,6 @@ func Upload3(address, dir, file string) {
 		return
 	}
 	writer.Close()
-
-	// w.Bar.Finish()
 
 	request, err := http.NewRequest("POST", _url, body)
 	if err != nil {
