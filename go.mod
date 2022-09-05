@@ -6,7 +6,6 @@ require (
 	github.com/cheggaaa/pb/v3 v3.0.8
 	github.com/fatih/color v1.10.0
 	github.com/gosuri/uitable v0.0.4
-	github.com/mgr9525/go-ruisutil v1.0.7
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v1.1.3

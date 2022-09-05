@@ -58,6 +58,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&address, "address", "a", "", "dispatch server 的地址，例如：-a http://127.0.0.1:8080/")
 	rootCmd.PersistentFlags().StringVarP(&dir, "dir", "d", "", "dispatch server 的目录路径，例如：-d /temp/")
+	rootCmd.PersistentFlags().StringVarP(&dir, "user", "u", "", "dispatch server 的认证用户")
+	rootCmd.PersistentFlags().StringVarP(&dir, "password", "P", "", "dispatch server 的认证密码")
 
 	// Note: the variable address will not be set to the value from config, when the --address flag is not provided by user.
 	_ = viper.BindPFlag("address", rootCmd.PersistentFlags().Lookup("address"))

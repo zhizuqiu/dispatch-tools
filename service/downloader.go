@@ -10,7 +10,7 @@ import (
 	"path"
 )
 
-func Download(dpath, durl string) {
+func Download(user, password, dpath, durl string) {
 
 	dpath = getDownloadPath(dpath)
 
@@ -22,7 +22,14 @@ func Download(dpath, durl string) {
 
 	filename := path.Base(uri.Path)
 
-	res, err := http.Get(durl)
+	req, err := http.NewRequest(http.MethodGet, durl, http.NoBody)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.SetBasicAuth(user, password)
+
+	res, err := HttpClient.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return

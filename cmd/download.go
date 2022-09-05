@@ -17,6 +17,7 @@ package cmd
 import (
 	"dispatch/service"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // downloadCmd represents the download command
@@ -33,8 +34,9 @@ dispatch download -p /temp/ http://127.0.0.1/some.zip
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
-
-		service.Download(path, args[0])
+		confUser := viper.GetString("user")
+		confPassword := viper.GetString("password")
+		service.Download(confUser, confPassword, path, args[0])
 	},
 }
 

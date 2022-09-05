@@ -11,7 +11,7 @@ import (
 	"sync"
 )
 
-func Upload(address, dir, file string) {
+func Upload(address, dir, user, password, file string) {
 	dir = parseDir(dir)
 	_url, err := getUploadUrl(address, dir)
 	if err != nil {
@@ -29,7 +29,7 @@ func Upload(address, dir, file string) {
 		return
 	}
 
-	response, err := uploadFileMultipart(_url, file)
+	response, err := uploadFileMultipart(_url, user, password, file)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -43,7 +43,7 @@ func Upload(address, dir, file string) {
 	}
 }
 
-func uploadFileMultipart(url string, path string) (*http.Response, error) {
+func uploadFileMultipart(url, user, password string, path string) (*http.Response, error) {
 	f, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, err
@@ -95,6 +95,7 @@ func uploadFileMultipart(url string, path string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	req.SetBasicAuth(user, password)
 	req.Header.Add("Content-Type", formWriter.FormDataContentType())
 
 	// This operation will block until both the formWriter

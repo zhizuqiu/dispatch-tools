@@ -51,7 +51,7 @@ type Path struct {
 	Path         string
 }
 
-func List(address, dir string, wide bool) {
+func List(address, dir, user, password string, wide bool) {
 
 	dir = parseDir(dir)
 	_url, err := getListUrl(address, dir)
@@ -68,7 +68,14 @@ func List(address, dir string, wide bool) {
 		return
 	}
 
-	resp, err := HttpClient.Get(_url)
+	req, err := http.NewRequest(http.MethodGet, _url, http.NoBody)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.SetBasicAuth(user, password)
+
+	resp, err := HttpClient.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return
