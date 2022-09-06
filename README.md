@@ -14,10 +14,14 @@ Available Commands:
   up          上传文件
 
 Flags:
-  -a, --address string   dispatch server 的地址，例如：-a http://127.0.0.1:8080/
-      --config string    配置文件 (默认：$HOME/.dispatch/dispatch.yaml)
-  -d, --dir string       dispatch server 的目录路径，例如：-d /temp/
-  -h, --help             help for dispatch
+  -a, --address string         dispatch server 的地址，例如：-a http://127.0.0.1:8080/
+      --config string          配置文件 (默认：$HOME/.dispatch/dispatch.yaml)
+  -d, --dir string             dispatch server 的目录路径，例如：-d /temp/
+  -h, --help                   help for dispatch
+      --http-password string   dispatch server 的认证密码
+      --http-user string       dispatch server 的认证用户
+
+Use "dispatch [command] --help" for more information about a command.
 ```
 
 ### build

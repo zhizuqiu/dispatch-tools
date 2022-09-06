@@ -34,8 +34,8 @@ dispatch download -p /temp/ http://127.0.0.1/some.zip
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		path, _ := cmd.Flags().GetString("path")
-		confUser := viper.GetString("user")
-		confPassword := viper.GetString("password")
+		confUser := viper.GetString("http-user")
+		confPassword := viper.GetString("http-password")
 		service.Download(confUser, confPassword, path, args[0])
 	},
 }

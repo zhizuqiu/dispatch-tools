@@ -37,8 +37,8 @@ dispatch list -a http://127.0.0.1:8080/ -d /temp/
 	Run: func(cmd *cobra.Command, args []string) {
 		confAddress := viper.GetString("address")
 		confDir := viper.GetString("dir")
-		confUser := viper.GetString("user")
-		confPassword := viper.GetString("password")
+		confUser := viper.GetString("http-user")
+		confPassword := viper.GetString("http-password")
 		wide, _ := cmd.Flags().GetBool("wide")
 
 		service.List(confAddress, confDir, confUser, confPassword, wide)

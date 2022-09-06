@@ -35,8 +35,8 @@ dispatch up -a http://127.0.0.1:8080/ -d /temp/ ./some.zip
 	Run: func(cmd *cobra.Command, args []string) {
 		confAddress := viper.GetString("address")
 		confDir := viper.GetString("dir")
-		confUser := viper.GetString("user")
-		confPassword := viper.GetString("password")
+		confUser := viper.GetString("http-user")
+		confPassword := viper.GetString("http-password")
 
 		service.Upload(confAddress, confDir, confUser, confPassword, args[0])
 	},
