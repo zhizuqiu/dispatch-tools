@@ -26,6 +26,17 @@ Use "dispatch [command] --help" for more information about a command.
 
 ### build
 
-```
+amd64:
+```bash
 GOOS=linux GOARCH=amd64 go build -o dist/amd64/dispatch
+```
+
+arm64:
+```bash
+GOOS=linux GOARCH=arm64 go build -o dist/arm64/dispatch
+```
+
+ppc64le:
+```bash
+GOOS=linux GOARCH=ppc64le go build -o dist/ppc64le/dispatch
 ```
