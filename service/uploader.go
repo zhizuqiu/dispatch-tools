@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -82,7 +83,7 @@ func uploadFileMultipart(url, user, password string, path string) (*http.Respons
 	reader.Bar.SetMaxWidth(100)
 
 	go func() {
-		partWriter, err := formWriter.CreateFormFile("upfile", path)
+		partWriter, err := formWriter.CreateFormFile("upfile", filepath.Base(path))
 		setErr(err)
 		_, err = io.Copy(partWriter, reader)
 		setErr(err)

@@ -59,7 +59,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "配置文件 (默认：$HOME/.dispatch/dispatch.yaml)")
 
 	rootCmd.PersistentFlags().StringVarP(&address, "address", "a", "http://127.0.0.1:8080/", "dispatch server 的地址，例如：-a http://127.0.0.1:8080/")
-	rootCmd.PersistentFlags().StringVarP(&dir, "dir", "d", "/", "dispatch server 的目录路径，例如：-d /temp/")
+	rootCmd.PersistentFlags().StringVarP(&dir, "dir", "d", "/", "dispatch server 的目录路径，例如：-d /temp/（server 命令中为本地数据根目录）")
 	rootCmd.PersistentFlags().StringVar(&httpUser, "http-user", "", "dispatch server 的认证用户")
 	rootCmd.PersistentFlags().StringVar(&httpPassword, "http-password", "", "dispatch server 的认证密码")
 

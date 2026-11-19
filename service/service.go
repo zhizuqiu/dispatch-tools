@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-var downloadBarTmpl = `{{ green "DOWNLOADING" }}: {{ bar . "[" ">" (cycle . "↖" "↗" "↘" "↙" ) "." "]"}}  {{percent .}}  {{counters . }} `
-var uploadBarTmpl = `{{ green "UPLOADING" }}: {{ bar . "[" ">" (cycle . "↖" "↗" "↘" "↙" ) "." "]"}}  {{percent .}}  {{counters . }} `
+var downloadBarTmpl = `{{ green "DOWNLOADING" }}: {{ if .Total }}{{ bar . "[" ">" (cycle . "↖" "↗" "↘" "↙" ) "." "]"}}  {{percent .}}  {{counters . }}{{ else }}空文件（0 字节）{{ end }}`
+var uploadBarTmpl = `{{ green "UPLOADING" }}: {{ if .Total }}{{ bar . "[" ">" (cycle . "↖" "↗" "↘" "↙" ) "." "]"}}  {{percent .}}  {{counters . }}{{ else }}空文件（0 字节）{{ end }}`
 
 func parseDir(dir string) string {
 	if dir == "" {
